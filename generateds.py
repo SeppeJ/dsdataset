@@ -29,15 +29,18 @@ def create_dataset():
             image_path = os.path.join(directory, 'dsdataset', shape.name)
             if not os.path.exists(image_path):
                 os.makedirs(image_path)
-            frame_json["file_path"] =  os.path.relpath(os.path.join(image_path, image_name), os.path.join(directory, 'dsdataset'))
+            frame_json["file_path"] =  image_name[:-4]
             frame_json["transform_matrix"] = listify_matrix(cam.matrix_world)
-            frame_json["angle_x"] = cam.data.angle_x
-            frame_json["angle_y"] = cam.data.angle_y
-            frame_json["shift_x"] = cam.data.shift_x
-            frame_json["shift_y"] = cam.data.shift_y
-            frame_json['sensor_height'] = cam.data.sensor_height
-            frame_json['sensor_width'] = cam.data.sensor_width
-            frame_json['sensor_fit'] = cam.data.sensor_fit
+            camera_json = {}
+            
+            camera_json["angle_x"] = cam.data.angle_x
+            camera_json["angle_y"] = cam.data.angle_y
+            camera_json["shift_x"] = cam.data.shift_x
+            camera_json["shift_y"] = cam.data.shift_y
+            camera_json['sensor_height'] = cam.data.sensor_height
+            camera_json['sensor_width'] = cam.data.sensor_width
+            camera_json['sensor_fit'] = cam.data.sensor_fit
+            frame_json["camera"] = camera_json
             transforms_json["frames"].append(frame_json)
             render_view(cam, os.path.join(image_path, image_name))
         transforms_json_path = os.path.join(directory, 'dsdataset', shape.name, "transforms.json")
