@@ -32,7 +32,6 @@ def create_dataset():
             frame_json["file_path"] =  image_name[:-4]
             frame_json["transform_matrix"] = listify_matrix(cam.matrix_world)
             camera_json = {}
-            
             camera_json["angle_x"] = cam.data.angle_x
             camera_json["angle_y"] = cam.data.angle_y
             camera_json["shift_x"] = cam.data.shift_x
@@ -50,16 +49,30 @@ def create_dataset():
 
 
 def render_view(cam, image_path):
+    filepath = bpy.data.filepath
+    directory = os.path.dirname(filepath)
     bpy.data.scenes['Scene'].camera = cam
+    bpy.data.scenes['Scene'].render.film_transparent = True
+    bpy.data.scenes['Scene'].render.resolution_x = 512
+    bpy.data.scenes['Scene'].render.resolution_y = 512
+    bpy.data.scenes['Scene'].render.image_settings.color_depth = '16'
     result = bpycv.render_data()
 #    image_path = os.path.join(directory, "r_" + str(indexcam) + ".png")
-#    with open(os.path.join(directory,'test'),'w') as file_object:
+#    with open(os.path.join(directory,'test.txt'),'w') as file_object:
 #         file_object.write("%s" % image_path)
 #    image_path = os.path.join(directory, shapename+ ".png")
 #    depth_path = os.path.join(directory, 'dataset', shapename,"/d_" , str(indexcam) + ".png")
 #    segmentation_path = os.path.join(directory, 'dataset', shapename,"/s_" , str(indexcam) + ".png")
 #    combined_path = os.path.join(directory, 'dataset', shapename,"/c_" , str(indexcam) + ".png")
-    cv2.imwrite(image_path, result["image"][..., ::-1])
+    rgb_image = result["image"][..., ::-1]
+#    mask = np.clip(np.uint16(result["inst"]), 0, 1)
+#    rgba_image = cv2.cvtColor(rgb_image, cv2.COLOR_RGB2RGBA)
+#    rgba_image[:, :, 3] = mask
+#    with open(os.path.join(directory,'test'),'w+') as file_object:
+#        file_object.write("%s" % str(mask.shape))
+#        file_object.write("%s" % str(rgb_image.shape))
+#        
+    cv2.imwrite(image_path, rgb_image)
 #    cv2.imwrite(depth_path, np.uint16(result["depth"]*1000))
 #    cv2.imwrite(segmentation_path,  np.uint16(result["inst"]))
 #    cv2.imwrite(combined_path, result.vis()[..., ::-1])
