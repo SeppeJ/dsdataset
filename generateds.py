@@ -21,6 +21,8 @@ def create_dataset():
     index_shapes = enumerate(bpy.data.collections['Objects'].all_objects)
 
     for index, shape in index_shapes:
+        if(shape.type != "MESH"):
+            continue
         transforms_json = {}
         transforms_json["frames"] = []
         for indexcam, cam in enumerate(cams):
