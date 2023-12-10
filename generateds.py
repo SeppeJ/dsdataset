@@ -60,12 +60,6 @@ def render_view(cam, image_path):
     bpy.data.scenes['Scene'].render.resolution_y = 512
     bpy.data.scenes['Scene'].render.image_settings.color_depth = '8'
     result = bpycv.render_data()
-#    image_path = os.path.join(directory, "r_" + str(indexcam) + ".png")
-    
-#    image_path = os.path.join(directory, shapename+ ".png")
-#    depth_path = os.path.join(directory, 'dataset', shapename,"/d_" , str(indexcam) + ".png")
-#    segmentation_path = os.path.join(directory, 'dataset', shapename,"/s_" , str(indexcam) + ".png")
-#    combined_path = os.path.join(directory, 'dataset', shapename,"/c_" , str(indexcam) + ".png")
     rgb_image = result["image"][..., ::-1]
     mask = result["inst"]
     with open(os.path.join(directory,'test.txt'),'w') as file_object:
@@ -74,18 +68,9 @@ def render_view(cam, image_path):
     visible = np.where(mask!=0)
     mask[transparent] = 0
     mask[visible] = 255
-    
-#    mask = np.clip(np.uint16(result["inst"]), 0, 1)
     rgba_image = cv2.cvtColor(rgb_image, cv2.COLOR_RGB2RGBA)
     rgba_image[:, :, 3] = mask
-#    with open(os.path.join(directory,'test'),'w+') as file_object:
-#        file_object.write("%s" % str(mask.shape))
-#        file_object.write("%s" % str(rgb_image.shape))
-#        
-    cv2.imwrite(image_path, rgba_image)
-#cv2.imwrite(depth_path, np.uint16(result["depth"]*1000))
-#    cv2.imwrite(, np.uint16(result["inst"]))
-    cv2.imwrite(os.path.join(directory,"test.png") , result.vis()[..., ::-1])
+    
 
 def listify_matrix(matrix):
     matrix_list = []
