@@ -62,8 +62,6 @@ def render_view(cam, image_path):
     result = bpycv.render_data()
     rgb_image = result["image"][..., ::-1]
     mask = result["inst"]
-    with open(os.path.join(directory,'test.txt'),'w') as file_object:
-         file_object.write("%s" % str(np.unique(mask)))
     transparent = np.where(mask==0)
     visible = np.where(mask!=0)
     mask[transparent] = 0
