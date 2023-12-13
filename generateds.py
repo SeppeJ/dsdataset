@@ -68,6 +68,7 @@ def render_view(cam, image_path):
     mask[visible] = 255
     rgba_image = cv2.cvtColor(rgb_image, cv2.COLOR_RGB2RGBA)
     rgba_image[:, :, 3] = mask
+    cv2.imwrite(image_path, rgba_image)
     
 
 def listify_matrix(matrix):
