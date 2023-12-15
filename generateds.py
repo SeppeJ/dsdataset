@@ -12,9 +12,16 @@ from mathutils import Matrix, Vector
 import numpy as np
 import json
 
-def create_dataset():
+VIEWS = 4
+
+def create_dataset(RESOLUTION, VIEWS):
     bpy.ops.object.select_all(action='DESELECT')
     bpy.context.scene.render.image_settings.file_format = 'PNG' 
+    bpy.data.scenes['Scene'].render.film_transparent = True
+    bpy.data.scenes['Scene'].render.resolution_x = RESOLUTION
+    bpy.data.scenes['Scene'].render.resolution_y = RESOLUTION
+    bpy.data.scenes['Scene'].render.image_settings.color_depth = '8'
+    
     cams = bpy.data.collections['Cameras'].all_objects
     filepath = bpy.data.filepath
     directory = os.path.dirname(filepath)
@@ -27,9 +34,10 @@ def create_dataset():
         transforms_json = {}
         transforms_json["frames"] = []
         for indexcam, cam in enumerate(cams):
+            bpy.data.scenes['Scene'].camera = cam
             frame_json = {}
             image_name = "r_" + str(indexcam) + ".png"
-            image_path = os.path.join(directory, 'dsdataset', shape.name)
+            image_path = os.path.join(directory, 'dsdataset', str(VIEWS), str(RESOLUTION), shape.name)
             if not os.path.exists(image_path):
                 os.makedirs(image_path)
             frame_json["file_path"] =  image_name[:-4]
@@ -45,20 +53,12 @@ def create_dataset():
             frame_json["camera"] = camera_json
             transforms_json["frames"].append(frame_json)
             render_view(cam, os.path.join(image_path, image_name))
-        transforms_json_path = os.path.join(directory, 'dsdataset', shape.name, "transforms.json")
+        transforms_json_path = os.path.join(directory, 'dsdataset', str(VIEWS), str(RESOLUTION), shape.name, "transforms.json")
         with open(transforms_json_path, 'w') as json_file: 
             json.dump(transforms_json, json_file)
             
 
-
 def render_view(cam, image_path):
-    filepath = bpy.data.filepath
-    directory = os.path.dirname(filepath)
-    bpy.data.scenes['Scene'].camera = cam
-    bpy.data.scenes['Scene'].render.film_transparent = True
-    bpy.data.scenes['Scene'].render.resolution_x = 512
-    bpy.data.scenes['Scene'].render.resolution_y = 512
-    bpy.data.scenes['Scene'].render.image_settings.color_depth = '8'
     result = bpycv.render_data()
     rgb_image = result["image"][..., ::-1]
     mask = result["inst"]
@@ -78,4 +78,5 @@ def listify_matrix(matrix):
     return matrix_list
 
 if __name__ == "__main__":
-    create_dataset()
+    for RESOLUTION in [32, 64, 128, 256, 512]:
+        create_dataset(RESOLUTION, VIEWS)
